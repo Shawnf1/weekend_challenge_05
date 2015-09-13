@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="myApp">
 <head lang="en">
     <meta charset="UTF-8">
     <title>Postgres TODO App</title>
@@ -7,31 +7,129 @@
     <!--STYLES-->
     <link rel="stylesheet" href="/vendors/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/styles/style.css">
-
-</head>
-<body>
-    <div class="container">
-        <button class="btn btn-info get">Get Info</button>
-
-        <div class="col-md-4">
-            <form id="taskForm" method="post">
-                <div>
-                    <label for="text">Task:</label>
-                    <input type="text" name="text" id="text"/>
-                    <input type="submit" class="btn btn-info post" value="Create Task"/>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="someContainer" class="container">
-
-    </div>
-
-
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
 
     <!--SCRIPTS-->
     <script type="text/javascript" src="/vendors/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript" src="/assets/scripts/app.min.js"></script>
+</head>
+<body ng-controller="myCtrl">
+<div class="container">
+    <button class="btn btn-info get">Get Info</button>
+
+    <div class="col-md-4">
+        <form id="taskForm" method="post">
+            <!--<div>-->
+            <!--Enter text and hit enter:-->
+            <!--<input type="text" ng-model="text" name="text" />-->
+            <!--<input type="submit" id="submit" value="Submit" />-->
+            <!--<pre>list={{list}}</pre>-->
+            <!--</div>-->
+            <div>
+                <label for="text">Task:</label>
+                <input type="text" name="text" id="text" ng-model="formData.text" />
+                <!--<input type="submit" class="btn btn-info post" value="Create Task"/>-->
+                <button class="btn btn-info post" ng-click="addTask()">Create Task</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="someContainer" class="container" style="color: white;" >
+    <div ng-repeat="task in tasks" ng-class="{complete: task.complete }" class="task well col-md-3" data-id="{{ task.id }}" data-complete="{{ task.complete }}">
+        <p class="lead" ng-click="updateTask($event)" >{{ task.text }}</p>
+        <button class="btn btn-danger delete">
+            X
+        </button>
+    </div>
+    <script>
+        var app = angular.module('myApp', []);
+        app.controller('myCtrl', function ($scope, $http) {
+            $scope.tasks = [];
+            angular.element(document).ready(function () {
+                console.log('ready');
+                $scope.getTasks();
+            });
+            $scope.addTask = function () {
+                console.log('addTask: ', $scope.formData.text);
+//                $http({
+//                   type: 'POST',
+//                    url: '/api/todos',
+//                    data: {text: $scope.formData.text}
+//                }).then(function (data) {
+//                    $scope.tasks = {};
+////                    $scope.tasks.push({text: $scope.formData.text});
+//                    $scope.tasks = data.data;
+//                    console.log('done ', $scope.tasks);
+////                    $scope.tasks = taskData;
+//                    $scope.appendTasks();
+//                });
+                $http.post('/api/todos', {text: $scope.formData.text})
+                    .then(function (data) {
+//                      $scope.tasks = {};
+                        $scope.tasks = data.data;
+                        console.log('post done', $scope.tasks);
+                });
+            };
+            $scope.appendTasks = function () {
+//                $scope.apply();
+            };
+            $scope.getTasks = function () {
+                $http.get('/api/todos').then(function (data) {
+                    console.log('get data', data);
+                    $scope.tasks = data.data;
+                    console.log('get plain', $scope.tasks);
+                });
+            };
+            $scope.updateTask = function (event) {
+                var target = $(event.target);
+//                angular.element(evt.target);// convert DOM element to jqlite element
+//        complete = !$(this).parent().data("complete");
+//        var text = $(this).text().replace(" ", "+");
+//        var putData = "text=" + text + "&complete=" + complete;
+//
+//        $.ajax({
+//            type: "PUT",
+//            data: putData,
+//            url: "/api/todos/" + $(this).parent().data("id"),
+//            success: function(data){
+//                taskData = data;
+//                appendTasks();
+//            }
+//        });
+//                var text = evt.target.text().replace(' ', '+');
+//                var data = {text: text, complete: true};
+//                console.log(evt);
+                var id = target.parent().data('id');
+//                console.log('id', id);
+//                console.log(evt.attributes['data-id'].value);
+//                var id = target.parent().attributes['data-id'].value;
+                var data = {
+                    text: target.text(),
+                    complete: (target.parent().data('complete') ? false : true)
+                };
+
+//                $scope.tasks.forEach(function (cv, i, a) {
+////                    console.log('cv ', i, cv);
+//                   if(cv.id == id) {
+////                       console.log('found id ', id, ' data: ', $scope.tasks[i]);
+//                       var complete = ($scope.tasks[i].complete) ? false : true;
+//                       data = {text: cv.text, complete: complete};
+////                       data = {text: cv.text.replace(' ', '+'), complete: complete};
+//                   }
+//                });
+                console.log('update', data);
+
+                 $http.put('/api/todos/'+ id, data)
+                     .then(function(data) {
+                            $scope.tasks = data.data;
+                     });
+            };
+        });
+    </script>
+</div>
+
+
+
 </body>
 </html>

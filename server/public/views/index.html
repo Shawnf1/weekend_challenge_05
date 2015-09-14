@@ -20,13 +20,13 @@
             <div>
                 <label for="text">Task:</label>
                 <input type="text" name="text" id="text" ng-model="formData.text" />
-                <button class="btn btn-info post" ng-click="addTask()">Create Task</button>
+                <button class="btn btn-info post" ng-click="addTask($event)">Create Task</button>
             </div>
         </form>
     </div>
 </div>
 
-<div id="someContainer" class="container" style="color: white;" >
+<div id="someContainer" class="container" >
     <div ng-repeat="task in tasks" ng-class="{complete: task.complete }" class="task well col-md-3" data-id="{{ task.id }}" data-complete="{{ task.complete }}">
         <p class="lead" ng-click="updateTask($event)" >{{ task.text }}</p>
         <button class="btn btn-danger delete" ng-click="deleteTask($event)">
@@ -35,6 +35,7 @@
     </div>
 </div>
 <script>
+    // error when put into separate file, keeping in html
     var app = angular.module('myApp', []);
     app.controller('myCtrl', function ($scope, $http) {
         $scope.tasks = [];

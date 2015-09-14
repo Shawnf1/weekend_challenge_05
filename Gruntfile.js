@@ -11,15 +11,6 @@ module.exports = function(grunt){
             }
         },
         copy: {
-            jquery: {
-                expand: true,
-                cwd: 'node_modules',
-                src: [
-                    "jquery/dist/jquery.min.js",
-                    "jquery/dist/jquery.min.map"
-                ],
-                "dest": "server/public/vendors/"
-            },
             bootstrap: {
                 expand: true,
                 cwd: 'node_modules',
